@@ -3,14 +3,14 @@
     "level": 1,
     "exp": 40,
     "max_exp": 120,
-    "health": 118.93113516416683,
+    "health": 118.82768160250016,
     "max_health": 110,
     "intellect": 12.0,
-    "mood": 54.93341211333338,
-    "hunger": 2.2206606250000123,
+    "mood": 54.51959786666673,
+    "hunger": 2.0137535016666783,
     "gold": 40,
     "character_type": "dog",
     "evolution_stage": 1,
     "dungeon_stage": 1,
-    "last_update": "2025-12-11T00:39:10.114699"
+    "last_update": "2025-12-11T10:09:12.112839"
 }

@@ -84,6 +84,8 @@ class GitAssistant:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=5
             )
             branch = branch_result.stdout.strip()
@@ -94,6 +96,8 @@ class GitAssistant:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=5
             )
             
@@ -156,6 +160,8 @@ class GitAssistant:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
             
@@ -281,6 +287,8 @@ Git Diff:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
             
@@ -314,6 +322,8 @@ Git Diff:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
             
@@ -344,6 +354,8 @@ Git Diff:
                 cwd=self.repo_path,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
             
