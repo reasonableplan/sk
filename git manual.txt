@@ -1,0 +1,16 @@
+1. git init/ git status/ clear/  
+
+
+2. git add 파일명
+git add .
+-staging/indexing
+-commit 에 포함시킬 파일들 추가
+
+3. git commit -m "message;;;;;;"
+
+4. git push
+- 로컬의 커밋을 원격과 동기화.(로컬->원격)
+
+-git clone url
+-원격 저장소를 로컬에 복제해서 로컬저장소 생성
+-git init: 로컬저장소를 생성
