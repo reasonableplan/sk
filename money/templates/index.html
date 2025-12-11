@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 글로벌 환율 및 금리 정보</title>
+    <!-- Chart.js 라이브러리 포함 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+        .container {
+            display: flex;
+            gap: 25px;
+            max-width: 1500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            flex-grow: 1;
+        }
+        .left-panel, .right-panel {
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #fefefe;
+            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+        }
+        .left-panel {
+            flex: 2; /* 왼쪽 패널이 오른쪽보다 약간 넓게 */
+            min-width: 450px;
+        }
+        .right-panel {
+            flex: 3; /* 오른쪽 패널이 더 넓게 */
+        }
+
+        .top-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+            align-items: center;
+        }
+        .top-controls label {
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;
+        }
+        .top-controls select, .top-controls input[type="text"], .top-controls button {
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .top-controls input[type="text"] {
+            flex-grow: 1;
+        }
+        .top-controls button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .top-controls button:hover {
+            background-color: #218838;
+        }
+        .top-controls select:focus, .top-controls input:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Table Styling */
+        #resultTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: #fff;
+            font-size: 0.9em;
+        }
+        #resultTable th, #resultTable td {
+            border: 1px solid #e9ecef;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        #resultTable th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        #resultTable tbody tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        #resultTable tbody tr:hover {
+            background-color: #e6f7ff;
+            cursor: pointer;
+        }
+        .selected-row {
+            background-color: #cceeff !important; /* 선택된 행 강조 */
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto; /* 테이블이 길어지면 스크롤바 생성 */
+            max-height: 400px; /* 적절한 최대 높이 설정 */
+        }
+
+        .detail-header {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .detail-current-value {
+            font-size: 1.2em;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        .change-info {
+            background-color: #e9f5ff;
+            border: 1px solid #b3d9ff;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            color: #333;
+        }
+        .change-info strong {
+            color: #0056b3;
+        }
+
+        .graph-tabs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            background-color: #e9ecef;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 6px 6px 0 0;
+            transition: background-color 0.2s, color 0.2s;
+            color: #495057;
+        }
+        .tab-buttons button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .tab-buttons button:not(.active):hover {
+            background-color: #cfd8dc;
+        }
+        .tab-content {
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            background-color: #fff;
+            flex-grow: 1;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .graph-canvas {
+            width: 100% !important;
+            height: 350px !important; /* 그래프 높이 고정 */
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            padding: 12px 18px;
+            background-color: #e2e3e5;
+            border-radius: 8px;
+            color: #495057;
+            font-size: 0.9em;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>💰 글로벌 환율 및 금리 정보</h1>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="top-controls">
+                <label for="searchType">검색 유형:</label>
+                <select id="searchType">
+                    <option value="exchange">환율</option>
+                    <option value="interest">금리</option>
+                </select>
+                <label for="searchQuery">검색어:</label>
+                <input type="text" id="searchQuery" placeholder="검색어를 입력하세요...">
+                <button id="searchBtn">검색</button>
+                <button id="refreshBtn">새로고침</button>
+            </div>
+
+            <div class="table-container">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>값</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 데이터는 JavaScript로 여기에 동적으로 로드됩니다. -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <h2 id="detailTitle" class="detail-header">선택된 항목: -</h2>
+            <p id="detailCurrentValue" class="detail-current-value">현재 값: -</p>
+
+            <div id="changeInfo" class="change-info">
+                <strong>과거 변화량:</strong><br>
+                <!-- 변화량 정보는 JavaScript로 여기에 동적으로 로드됩니다. -->
+                항목을 선택하면 상세 정보가 표시됩니다.
+            </div>
+
+            <div class="graph-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="fxGraph">환율 추이</button>
+                    <button class="tab-btn" data-tab="irGraph">금리 추이</button>
+                </div>
+
+                <div id="fxGraph" class="tab-content active">
+                    <canvas id="fxChart" class="graph-canvas"></canvas>
+                </div>
+                <div id="irGraph" class="tab-content">
+                    <canvas id="irChart" class="graph-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusBar" class="status-bar">준비 완료</div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:5000/api'; // Flask 백엔드 주소
+
+        const searchTypeSelect = document.getElementById('searchType');
+        const searchQueryInput = document.getElementById('searchQuery');
+        const searchBtn = document.getElementById('searchBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const resultTableBody = document.querySelector('#resultTable tbody');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailCurrentValue = document.getElementById('detailCurrentValue');
+        const changeInfoDiv = document.getElementById('changeInfo');
+        const statusBar = document.getElementById('statusBar');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        let allExchangeRates = [];
+        let allInterestRates = [];
+        let currentSelectedData = null; // 현재 선택된 항목의 원본 데이터를 저장
+
+        // Chart.js 인스턴스
+        let fxChartInstance = null;
+        let irChartInstance = null;
+
+        function updateStatusBar(message, type = 'info') {
+            statusBar.textContent = message;
+            statusBar.style.backgroundColor = type === 'error' ? '#f8d7da' : '#e2e3e5';
+            statusBar.style.color = type === 'error' ? '#721c24' : '#495057';
+        }
+
+        async function fetchDataAndRender() {
+            updateStatusBar("데이터 로딩 중...", 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/data`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                allExchangeRates = data.exchangeRates;
+                allInterestRates = data.interestRates;
+                populateResults();
+                updateStatusBar("데이터 로드 완료.", 'info');
+            } catch (error) {
+                console.error("Error fetching initial data:", error);
+                updateStatusBar(`데이터 로드 실패: ${error.message}`, 'error');
+            }
+        }
+
+        function populateResults() {
+            resultTableBody.innerHTML = '';
+            const searchType = searchTypeSelect.value;
+            const searchQuery = searchQueryInput.value.toLowerCase();
+            let dataToDisplay = [];
+
+            if (searchType === 'exchange') {
+                dataToDisplay = allExchangeRates.filter(item => 
+                    item["통화쌍"].toLowerCase().includes(searchQuery)
+                );
+                dataToDisplay.forEach((item, index) => {
+                    const row = resultTableBody.insertRow();
+                    row.dataset.type = 'fx';
+                    row.dataset.originalIndex = allExchangeRates.indexOf(item); // 원본 배열 인덱스
+                    row.dataset.tickerOrCountry = item.Ticker; // 상세 정보 요청에 필요
+                    row.insertCell(0).textContent = item["통화쌍"];
+                    row.insertCell(1).textContent = item["환율"] ? item["환율"].toFixed(4) : "N/A";
+                    row.addEventListener('click', () => handleItemSelection(row, item));
+                });
+            } else if (searchType === 'interest') {
+                dataToDisplay = allInterestRates.filter(item => 
+                    item["국가"].toLowerCase().includes(searchQuery)
+                );
+                dataToDisplay.forEach((item, index) => {
+                    const row = resultTableBody.insertRow();
+                    row.dataset.type = 'ir';
+                    row.dataset.originalIndex = allInterestRates.indexOf(item); // 원본 배열 인덱스
+                    row.dataset.tickerOrCountry = item.국가; // 상세 정보 요청에 필요
+                    row.insertCell(0).textContent = item["국가"];
+                    row.insertCell(1).textContent = item["기준 금리"];
+                    row.addEventListener('click', () => handleItemSelection(row, item));
+                });
+            }
+        }
+
+        async function handleItemSelection(rowElement, dataItem) {
+            // 이전에 선택된 행의 스타일 제거
+            const prevSelected = document.querySelector('#resultTable tbody .selected-row');
+            if (prevSelected) {
+                prevSelected.classList.remove('selected-row');
+            }
+            // 현재 선택된 행에 스타일 추가
+            rowElement.classList.add('selected-row');
+
+            currentSelectedData = dataItem;
+            updateStatusBar("상세 정보 로딩 중...", 'info');
+
+            detailTitle.textContent = `${dataItem.type === 'fx' ? '통화쌍' : '국가'}: ${dataItem.type === 'fx' ? dataItem["통화쌍"] : dataItem["국가"]}`;
+            detailCurrentValue.textContent = `현재 ${dataItem.type === 'fx' ? '환율' : '기준 금리'}: ${dataItem.type === 'fx' ? (dataItem["환율"] ? dataItem["환율"].toFixed(4) : "N/A") : dataItem["기준 금리"]}`;
+            
+            // 현재 값을 숫자로 파싱
+            let currentRateNumeric;
+            if (dataItem.type === 'fx') {
+                currentRateNumeric = parseFloat(dataItem["환율"]);
+            } else { // 'ir'
+                const match = dataItem["기준 금리"] ? dataItem["기준 금리"].match(/(\d+\.?\d*)%?/) : null;
+                currentRateNumeric = match ? parseFloat(match[1]) : NaN;
+            }
+
+            if (isNaN(currentRateNumeric)) {
+                changeInfoDiv.innerHTML = "<strong>과거 변화량:</strong><br>현재 값을 숫자로 변환할 수 없어 상세 정보를 가져올 수 없습니다.";
+                renderChart('fxChart', [], [], '', '', '데이터 없음');
+                renderChart('irChart', [], [], '', '', '데이터 없음');
+                updateStatusBar("상세 정보 로드 실패 (값 변환 오류).", 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/details`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        itemType: rowElement.dataset.type,
+                        itemId: rowElement.dataset.originalIndex,
+                        currentRate: currentRateNumeric,
+                        tickerOrCountry: rowElement.dataset.tickerOrCountry
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const details = await response.json();
+
+                if (details.error) {
+                    throw new Error(details.error);
+                }
+                
+                changeInfoDiv.innerHTML = `<strong>과거 변화량:</strong><br>${details.changesText || "변화량 정보 없음."}`;
+                
+                const labels = details.graphData.map(d => d.date);
+                const values = details.graphData.map(d => d.value);
+
+                if (rowElement.dataset.type === 'fx') {
+                    activateTab('fxGraph');
+                    renderChart('fxChart', labels, values, '환율', '#007bff', `${dataItem["통화쌍"]} 추이`);
+                } else if (rowElement.dataset.type === 'ir') {
+                    activateTab('irGraph');
+                    renderChart('irChart', labels, values, '금리 (%)', '#28a745', `${dataItem["국가"]} 추이`);
+                }
+                updateStatusBar("상세 정보 로드 완료.", 'info');
+
+            } catch (error) {
+                console.error("Error fetching details:", error);
+                changeInfoDiv.innerHTML = `<strong>과거 변화량:</strong><br>상세 정보를 가져오는 중 오류 발생: ${error.message}`;
+                renderChart('fxChart', [], [], '', '', '데이터 로드 오류');
+                renderChart('irChart', [], [], '', '', '데이터 로드 오류');
+                updateStatusBar(`상세 정보 로드 실패: ${error.message}`, 'error');
+            }
+        }
+
+        function renderChart(canvasId, labels, data, ylabel, color, title) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chartConfig = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: ylabel,
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: `${color}33`, // 20% opacity
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 16, weight: 'bold' },
+                            color: '#343a40'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: false },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 10,
+                                font: { size: 10 }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: ylabel,
+                                font: { size: 12, weight: 'bold' },
+                                color: '#495057'
+                            },
+                            ticks: {
+                                font: { size: 10 }
+                            },
+                            grid: {
+                                color: '#e9ecef'
+                            }
+                        }
+                    }
+                }
+            };
+            
+            if (canvasId === 'fxChart') {
+                if (fxChartInstance) fxChartInstance.destroy();
+                fxChartInstance = new Chart(ctx, chartConfig);
+            } else if (canvasId === 'irChart') {
+                if (irChartInstance) irChartInstance.destroy();
+                irChartInstance = new Chart(ctx, chartConfig);
+            }
+        }
+
+        function activateTab(tabId) {
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active');
+                }
+            });
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        // 이벤트 리스너
+        searchBtn.addEventListener('click', populateResults);
+        searchQueryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') populateResults();
+        });
+        searchTypeSelect.addEventListener('change', populateResults);
+        refreshBtn.addEventListener('click', fetchDataAndRender);
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                activateTab(tabId);
+                // 탭 전환 시 차트가 다시 그려지도록 (필요한 경우)
+                // if (currentSelectedData) {
+                //     handleItemSelection(document.querySelector('.selected-row'), currentSelectedData);
+                // }
+            });
+        });
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', fetchDataAndRender);
+    </script>
+</body>
+</html>

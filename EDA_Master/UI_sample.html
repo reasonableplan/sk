@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파스텔 블루 톤의 UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: row-reverse;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #b3d9ff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: #1a66ff;
+            text-decoration: none;
+        }
+        main {
+            flex: 3;
+            padding-left: 20px;
+        }
+        .sidebar {
+            flex: 1;
+            background-color: #cce6ff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .content-section {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        footer {
+            background-color: #80bfff;
+
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .search-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+        }
+        .search-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4d94ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background-color: #1a66ff;
+        }
+        h1, h2, h3 {
+            color: #0052cc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>웹사이트 제목</h1>
+        <nav>
+            <ul>
+                <li><a href="#">홈</a></li>
+                <li><a href="#">소개</a></li>
+                <li><a href="#">서비스</a></li>
+                <li><a href="#">연락처</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main>
+            <section class="content-section">
+                <h2>주요 콘텐츠</h2>
+                <p>여기에 주요 내용을 작성하세요.</p>
+            </section>
+
+            <section class="content-section">
+                <h2>추가 정보</h2>
+                <p>추가적인 정보나 설명을 여기에 작성하세요.</p>
+            </section>
+        </main>
+
+        <aside class="sidebar">
+            <h2>검색</h2>
+            <form class="search-form">
+                <input type="text" placeholder="검색어를 입력하세요...">
+                <button type="submit">검색</button>
+            </form>
+
+            <h3>카테고리</h3>
+            <ul>
+                <li><a href="#">카테고리 1</a></li>
+                <li><a href="#">카테고리 2</a></li>
+                <li><a href="#">카테고리 3</a></li>
+                <li><a href="#">카테고리 4</a></li>
+            </ul>
+
+            <h3>최근 게시물</h3>
+            <ul>
+                <li><a href="#">게시물 1</a></li>
+                <li><a href="#">게시물 2</a></li>
+                <li><a href="#">게시물 3</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 웹사이트 이름. 모든 권리 보유.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+    "name": "DesktopPet",
+    "level": 1,
+    "exp": 10,
+    "max_exp": 100,
+    "health": 99.99928887333333,
+    "max_health": 100.0,
+    "intellect": 10.0,
+    "mood": 50.0,
+    "hunger": 44.93001831166665,
+    "gold": 0,
+    "last_update": "2025-12-10T14:47:32.562810"
+}

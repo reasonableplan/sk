@@ -1,0 +1,16 @@
+{
+    "name": "DesktopPet",
+    "level": 1,
+    "exp": 40,
+    "max_exp": 120,
+    "health": 118.93113516416683,
+    "max_health": 110,
+    "intellect": 12.0,
+    "mood": 54.93341211333338,
+    "hunger": 2.2206606250000123,
+    "gold": 40,
+    "character_type": "dog",
+    "evolution_stage": 1,
+    "dungeon_stage": 1,
+    "last_update": "2025-12-11T00:39:10.114699"
+}
